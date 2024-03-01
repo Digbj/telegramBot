@@ -270,7 +270,7 @@ async function chatWithMaya(messages) {
             return chatCompletion.choices[0].message.content;
         } else {
             // Return a message indicating no relevant queries found
-            return "I'm sorry, I can only assist with gynecology-related queries.";
+            return "I'm sorry, I can only assist with sexual wellbeing-related queries.";
         }
     } catch (error) {
         console.error("Error:", error);
@@ -294,7 +294,8 @@ function getLastAssistantResponse(messages) {
   }
   
   // Function to handle incoming Telegram messages
-  bot.on('message', async (msg) => {
+ // Function to handle incoming Telegram messages
+bot.on('message', async (msg) => {
     const chatId = msg.chat.id;
 
     // Check if the message is not empty
@@ -303,20 +304,29 @@ function getLastAssistantResponse(messages) {
             // Find the last assistant's response
             const lastAssistantResponse = getLastAssistantResponse(messages);
 
-            // Send the last assistant's response along with the user's message to the Julep AI model
-            const response = await chatWithMaya([
-                { role: "user", name: "User", content: msg.text },
-                { role: "assistant", name: "Maya", content: lastAssistantResponse } // Include last assistant's response
-            ]);
+            // Check if the message contains any gynecology keywords
+            const containsGynecologyKeyword = filterGynecologyMessages([{ role: "user", name: "User", content: msg.text }]).length > 0;
 
-            // Send the response from the Julep AI model back to the user
-            bot.sendMessage(chatId, response);
+            if (containsGynecologyKeyword) {
+                // Send the last assistant's response along with the user's message to the Julep AI model
+                const response = await chatWithMaya([
+                    { role: "user", name: "User", content: msg.text },
+                    { role: "assistant", name: "Maya", content: lastAssistantResponse } // Include last assistant's response
+                ]);
+
+                // Send the response from the Julep AI model back to the user
+                bot.sendMessage(chatId, response);
+            } else {
+                // Return a message indicating no relevant queries found
+                bot.sendMessage(chatId, "I'm sorry, I can only assist with sexual wellbeing-related queries.");
+            }
         } catch (error) {
             console.error("Error:", error);
             bot.sendMessage(chatId, "An error occurred while processing your request.");
         }
     }
 });
+
   
   
 
