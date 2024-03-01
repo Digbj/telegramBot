@@ -7,7 +7,8 @@ const julep = require("@julep/sdk");
 const app=express();
 
 //tellegram token
-const MY_TOKEN = process.env.TELEGRAM_TOKEN;
+// const MY_TOKEN = process.env.TELEGRAM_TOKEN;
+const MY_TOKEN='7065389897:AAH1fLXcbSYo-lR7bW4LfvlRsD11GkYYJ7Y'
 const bot = new TelegramBot(MY_TOKEN, { polling: true });
 
 //julep ai api
