@@ -7,11 +7,11 @@ const julep = require("@julep/sdk");
 const app=express();
 
 //tellegram token
-const MY_TOKEN = '7065389897:AAH1fLXcbSYo-lR7bW4LfvlRsD11GkYYJ7Y';
+const MY_TOKEN = process.env.TELEGRAM_TOKEN;
 const bot = new TelegramBot(MY_TOKEN, { polling: true });
 
 //julep ai api
-const THIRD_PARTY_API_KEY = 'eyJvcmciOiI2NGZiMTNmZTQ5ZmY1YjAwMDE1NGUxMGMiLCJpZCI6IjViNGIxY2Y2M2UyNjQyYWRhMGJmNGFmNDhmOTQyYmI2IiwiaCI6Im11cm11cjEyOCJ9';
+const THIRD_PARTY_API_KEY=process.env.THIRD_PARTY_API_KEY
 const client = new julep.Client({ apiKey: THIRD_PARTY_API_KEY });
 
 // Function to chat with the Maya assistant using Julep AI
