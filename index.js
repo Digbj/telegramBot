@@ -232,25 +232,52 @@ const messages = [
 ]
 // //trained bot message
 
-async function chatWithMaya(messages) {
-  try {
-    const chatCompletion = await client.chat.completions.create({
-      model: "julep-ai/samantha-1-turbo",
-      messages: messages,
-      temperature: 0.37,
-      max_tokens: 6995,
-      top_p: 1,
-      frequency_penalty: 0,
-      presence_penalty: 0,
-      stop: ["<", "<|"],
+
+//filtering the queries
+function filterGynecologyMessages(messages) {
+    // Define keywords related to gynecology
+    const gynecologyKeywords = ["sex", "sexual", "wellbeing", "exercises", "health","orgasm", "pleasure"];
+
+    // Filter messages containing gynecology keywords
+    const filteredMessages = messages.filter(message => {
+        const messageContent = message.content.toLowerCase();
+        return gynecologyKeywords.some(keyword => messageContent.includes(keyword));
     });
 
-    return chatCompletion.choices[0].message.content;
-  } catch (error) {
-    console.error("Error:", error);
-    return "An error occurred while processing your request.";
-  }
+    return filteredMessages;
 }
+
+
+
+async function chatWithMaya(messages) {
+    try {
+        // Filter relevant messages for gynecology
+        const filteredMessages = filterGynecologyMessages(messages);
+
+        // Check if there are relevant messages
+        if (filteredMessages.length > 0) {
+            const chatCompletion = await client.chat.completions.create({
+                model: "julep-ai/samantha-1-turbo",
+                messages: filteredMessages,
+                temperature: 0.37,
+                max_tokens: 6995,
+                top_p: 1,
+                frequency_penalty: 0,
+                presence_penalty: 0,
+                stop: ["<", "<|"],
+            });
+
+            return chatCompletion.choices[0].message.content;
+        } else {
+            // Return a message indicating no relevant queries found
+            return "I'm sorry, I can only assist with gynecology-related queries.";
+        }
+    } catch (error) {
+        console.error("Error:", error);
+        return "An error occurred while processing your request.";
+    }
+}
+
 
 
 
@@ -269,27 +296,27 @@ function getLastAssistantResponse(messages) {
   // Function to handle incoming Telegram messages
   bot.on('message', async (msg) => {
     const chatId = msg.chat.id;
-  
+
     // Check if the message is not empty
     if (msg.text) {
-      try {
-        // Find the last assistant's response
-        const lastAssistantResponse = getLastAssistantResponse(messages);
-  
-        // Send the last assistant's response along with the user's message to the Julep AI model
-        const response = await chatWithMaya([
-          { role: "user", name: "User", content: msg.text },
-          { role: "assistant", name: "Maya", content: lastAssistantResponse } // Include last assistant's response
-        ]);
-  
-        // Send the response from the Julep AI model back to the user
-        bot.sendMessage(chatId, response);
-      } catch (error) {
-        console.error("Error:", error);
-        bot.sendMessage(chatId, "An error occurred while processing your request.");
-      }
+        try {
+            // Find the last assistant's response
+            const lastAssistantResponse = getLastAssistantResponse(messages);
+
+            // Send the last assistant's response along with the user's message to the Julep AI model
+            const response = await chatWithMaya([
+                { role: "user", name: "User", content: msg.text },
+                { role: "assistant", name: "Maya", content: lastAssistantResponse } // Include last assistant's response
+            ]);
+
+            // Send the response from the Julep AI model back to the user
+            bot.sendMessage(chatId, response);
+        } catch (error) {
+            console.error("Error:", error);
+            bot.sendMessage(chatId, "An error occurred while processing your request.");
+        }
     }
-  });
+});
   
   
 
@@ -297,7 +324,7 @@ function getLastAssistantResponse(messages) {
 // Function to handle /start command from Telegram
 bot.onText(/\/start/, (msg) => {
   const chatId = msg.chat.id;
-  bot.sendMessage(chatId, 'Welcome to the first Telegram bot!');
+  bot.sendMessage(chatId);
 });
 
 
