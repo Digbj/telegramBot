@@ -295,27 +295,44 @@ function getLastAssistantResponse(messages) {
   
   // Function to handle incoming Telegram messages
  // Function to handle incoming Telegram messages
-bot.on('message', async (msg) => {
+ bot.on('message', async (msg) => {
     const chatId = msg.chat.id;
 
     // Check if the message is not empty
     if (msg.text) {
         try {
-            // Find the last assistant's response
-            const lastAssistantResponse = getLastAssistantResponse(messages);
-
             // Check if the message contains any gynecology keywords
             const containsGynecologyKeyword = filterGynecologyMessages([{ role: "user", name: "User", content: msg.text }]).length > 0;
 
             if (containsGynecologyKeyword) {
-                // Send the last assistant's response along with the user's message to the Julep AI model
-                const response = await chatWithMaya([
-                    { role: "user", name: "User", content: msg.text },
-                    { role: "assistant", name: "Maya", content: lastAssistantResponse } // Include last assistant's response
-                ]);
+                // Find the last assistant's response
+                const lastAssistantResponse = getLastAssistantResponse(messages);
 
-                // Send the response from the Julep AI model back to the user
-                bot.sendMessage(chatId, response);
+                // Check if the last assistant's response contains the age confirmation query
+                const isAskingForAge = lastAssistantResponse && lastAssistantResponse.includes("Are you 21 years or older?");
+                
+                if (isAskingForAge) {
+                    // Check if the user's response is a valid age
+                    const userAge = parseInt(msg.text);
+                    if (!isNaN(userAge) && userAge >= 21) {
+                        // If the user is 21 or older, proceed with the conversation
+                        const response = await chatWithMaya([
+                            { role: "user", name: "User", content: msg.text },
+                            { role: "assistant", name: "Maya", content: lastAssistantResponse } // Include last assistant's response
+                        ]);
+                        bot.sendMessage(chatId, response);
+                    } else {
+                        // If the user is younger than 21, send a message indicating age restriction
+                        bot.sendMessage(chatId, "I'm sorry, I can only assist users who are 21 years or older.");
+                    }
+                } else {
+                    // Send the last assistant's response along with the user's message to the Julep AI model
+                    const response = await chatWithMaya([
+                        { role: "user", name: "User", content: msg.text },
+                        { role: "assistant", name: "Maya", content: lastAssistantResponse } // Include last assistant's response
+                    ]);
+                    bot.sendMessage(chatId, response);
+                }
             } else {
                 // Return a message indicating no relevant queries found
                 bot.sendMessage(chatId, "I'm sorry, I can only assist with sexual wellbeing-related queries.");
@@ -325,6 +342,14 @@ bot.on('message', async (msg) => {
             bot.sendMessage(chatId, "An error occurred while processing your request.");
         }
     }
+});
+
+// Function to handle /start command from Telegram
+bot.onText(/\/start/, (msg) => {
+    const chatId = msg.chat.id;
+
+    // Send a welcome message and ask the user if they want to ask questions or listen to audio stories
+    bot.sendMessage(chatId, "Hello! I'm here to help you with any questions or concerns you may have about sexual wellbeing. Would you like to ask questions or listen to audio stories?\n\n1. Ask Questions\n2. Listen to Audio Stories");
 });
 
   
