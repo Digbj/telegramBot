@@ -1,8 +1,10 @@
+const express=require('express');
 const TelegramBot = require('node-telegram-bot-api');
 const dotenv=require('dotenv').config()
 const julep = require("@julep/sdk");
 
-
+//express
+const app=express();
 
 const MY_TOKEN = '7065389897:AAH1fLXcbSYo-lR7bW4LfvlRsD11GkYYJ7Y';
 const bot = new TelegramBot(MY_TOKEN, { polling: true });
@@ -248,29 +250,10 @@ async function chatWithMaya(messages) {
   }
 }
 
-// Function to handle incoming Telegram messages
-// bot.on('message', async (msg) => {
-//   const chatId = msg.chat.id;
-
-//   // Check if the message is not empty
-//   if (msg.text) {
-//     try {
-//       // Send the user's message to the Julep AI model
-//       const response = await chatWithMaya([
-//         { role: "user", name: "User", content: msg.text }
-//       ]);
-
-//       // Send the response from the Julep AI model back to the user
-//       bot.sendMessage(chatId, response);
-//     } catch (error) {
-//       console.error("Error:", error);
-//       bot.sendMessage(chatId, "An error occurred while processing your request.");
-//     }
-//   }
-// });
 
 
-// Function to find the last assistant's response from the messages array
+
+
 // Function to find the last assistant's response from the messages array
 function getLastAssistantResponse(messages) {
     for (let i = messages.length - 1; i >= 0; i--) {
@@ -317,7 +300,9 @@ bot.onText(/\/start/, (msg) => {
 
 
 
-
-
+//listening
+app.listen(8000,()=>{
+    console.log("I am live at 8000")
+})
 
 
