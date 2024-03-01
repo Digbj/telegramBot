@@ -299,6 +299,9 @@ bot.onText(/\/start/, (msg) => {
 });
 
 
+app.get('/',(req,res)=>{
+    res.send("telegram bot")
+})
 
 //listening
 app.listen(8000,()=>{
