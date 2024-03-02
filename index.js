@@ -236,7 +236,7 @@ const messages = [
 //filtering the queries
 function filterGynecologyMessages(messages) {
     // Define keywords related to gynecology
-    const gynecologyKeywords = ["sex", "sexual", "wellbeing", "exercises", "health","orgasm", "pleasure"];
+    const gynecologyKeywords = [];
 
     // Filter messages containing gynecology keywords
     const filteredMessages = messages.filter(message => {
