@@ -260,7 +260,7 @@ async function chatWithMaya(messages) {
                 model: "julep-ai/samantha-1-turbo",
                 messages: filteredMessages,
                 temperature: 0.37,
-                max_tokens: 6995,
+                max_tokens: 200,
                 top_p: 1,
                 frequency_penalty: 0,
                 presence_penalty: 0,
