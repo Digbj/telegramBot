@@ -1,24 +1,20 @@
-const express=require('express');
+const express = require('express');
 const TelegramBot = require('node-telegram-bot-api');
-const dotenv=require('dotenv').config()
+const dotenv = require('dotenv').config();
 const julep = require("@julep/sdk");
 
-//express
-const app=express();
+// Initialize Express app
+const app = express();
 
-//tellegram token
-// const MY_TOKEN = process.env.TELEGRAM_TOKEN;
-const MY_TOKEN='7065389897:AAH1fLXcbSYo-lR7bW4LfvlRsD11GkYYJ7Y'
+// Telegram bot token
+const MY_TOKEN = '7065389897:AAH1fLXcbSYo-lR7bW4LfvlRsD11GkYYJ7Y';
 const bot = new TelegramBot(MY_TOKEN, { polling: true });
 
-//julep ai api
-const THIRD_PARTY_API_KEY=process.env.THIRD_PARTY_API_KEY
+// Julep AI API key
+const THIRD_PARTY_API_KEY = 'YOUR_JULEP_API_KEY';
 const client = new julep.Client({ apiKey: THIRD_PARTY_API_KEY });
 
-// Function to chat with the Maya assistant using Julep AI
-
-
-const messages = [
+message = [
     {
         "role": "system",
         "name": "situation",
@@ -35,9 +31,7 @@ const messages = [
         "content": "Hello! I'm here to help you with any questions or concerns you may have about sexual wellbeing. I'm a qualified sex therapist, educator, and doctor. Let's talk about what's on your mind."
     }, 
 ]
-// //trained bot message
-
-
+// Function to chat with the Maya assistant using Julep AI
 async function chatWithMaya(message) {
     try {
         const chatCompletion = await client.chat.completions.create({
@@ -62,8 +56,27 @@ bot.on('message', async (msg) => {
     const chatId = msg.chat.id;
     if (msg.text) {
         try {
-            const response = await chatWithMaya({ role: "user", name: "User", content: msg.text });
-            bot.sendMessage(chatId, response);
+            if (msg.text.toLowerCase() === 'hi') {
+                // Send the specified welcome message
+                const welcomeMessage = "Hi, I am Maya, your dedicated relationship and intimacy coach. Welcome to ATOG, where our mission is to empower women to explore and understand their sexuality. Would you like to ask questions or listen to audio stories?\n\n1. Listen to Audio Stories\n2. Type AMA to ask questions";
+                bot.sendMessage(chatId, welcomeMessage);
+            } else if (msg.text === '1') {
+                // Continue with bot reply
+                const lastAssistantResponse = getLastAssistantResponse(messages);
+                const response = await chatWithMaya([
+                    { role: "user", name: "User", content: msg.text },
+                    { role: "assistant", name: "Maya", content: lastAssistantResponse }
+                ]);
+                bot.sendMessage(chatId, response);
+            } else if (msg.text === '2') {
+                // Redirect to audio playlist
+                // You can implement the functionality to play audio here
+                bot.sendMessage(chatId, "Here's the audio playlist...");
+            } else {
+                // Send other messages to Maya for processing
+                const response = await chatWithMaya({ role: "user", name: "User", content: msg.text });
+                bot.sendMessage(chatId, response);
+            }
         } catch (error) {
             console.error("Error:", error);
             bot.sendMessage(chatId, "An error occurred while processing your request.");
@@ -74,8 +87,18 @@ bot.on('message', async (msg) => {
 // Function to handle /start command from Telegram
 bot.onText(/\/start/, (msg) => {
     const chatId = msg.chat.id;
-    bot.sendMessage(chatId, "Hello! I'm here to help you with any questions or concerns you may have about sexual wellbeing. Would you like to ask questions or listen to audio stories?\n\n1. Ask Questions\n2. Listen to Audio Stories");
+    bot.sendMessage(chatId, "");
 });
+
+// Function to find the last assistant's response from the messages array
+function getLastAssistantResponse(messages) {
+    for (let i = messages.length - 1; i >= 0; i--) {
+        if (messages[i].role === "assistant") {
+            return messages[i].content;
+        }
+    }
+    return null; // Return null if no assistant response is found
+}
 
 // Express route for health check
 app.get('/', (req, res) => {
