@@ -419,7 +419,7 @@ async function chatWithMaya(messages) {
         messages: filteredMessages,
         temperature: 0.37,
         max_tokens: 200,
-        top_p: 0,
+        top_p: 1,
         frequency_penalty: 0,
         presence_penalty: 0,
         stop: ["<", "<|"],
@@ -503,11 +503,12 @@ bot.on("message", async (msg) => {
           // Send each playlist URL sequentially
           audioPlaylists.forEach((playlistUrl, index) => {
             setTimeout(() => {
+                // console.log(index);
               bot.sendMessage(chatId, playlistUrl);
-            }, index * 2000); // Delay between sending each playlist (adjust as needed)
+            }, index * 1000); 
           });
       } else {
-        // Check if the user's message contains any keyword related to gynecology
+        // Check if the user's message contains any keyword 
         const containsGynecologyKeyword =
           filterGynecologyMessages([{ content: msg.text }]).length > 0;
 
