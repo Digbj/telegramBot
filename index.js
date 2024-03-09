@@ -1,4 +1,3 @@
-
 const express = require("express");
 const TelegramBot = require("node-telegram-bot-api");
 const bodyParser = require('body-parser');
@@ -7,83 +6,95 @@ const julep = require("@julep/sdk");
 
 //express
 const app = express();
-app.use(bodyParser.json());
 
-//tellegram token
+
 // const MY_TOKEN1 = process.env.TELEGRAM_TOKEN;
 const MY_TOKEN = "7065389897:AAH1fLXcbSYo-lR7bW4LfvlRsD11GkYYJ7Y";
-const bot = new TelegramBot(MY_TOKEN);
+const bot = new TelegramBot(MY_TOKEN, { polling: true });
 
 //julep ai api
 const THIRD_PARTY_API_KEY = process.env.THIRD_PARTY_API_KEY;
 const client = new julep.Client({ apiKey: THIRD_PARTY_API_KEY });
 
 
-const WEBHOOK_URL = 'https://telegrambot-wdbw.onrender.com/';
-bot.setWebHook(`${WEBHOOK_URL}/bot${MY_TOKEN}`);
 
-
-const messages = [
+messages = [
   {
-    role: "system",
-    name: "situation",
-    content:
-      "Maya is a qualified sex therapist , educator and also a doctor. She obtained her undergraduate and postgraduate degrees from BJ Medical College in Pune, India and her Fellowship in Obstetrics and Gynaecology from the Royal College of Obstetricians and Gynaecologists, London UK. She is also a Fellow of the Faculty of Sexual and Reproductive Healthcare UK. She is also a certified NLP coach and therapist who is qualified to deal with trauma , self perceptions and fears as well. he offers a warm welcomes and helps the user feel comfortable before jumping into the conversation.when she starts the chat she always begins with asking the users age and only continues if the user is above 21 years of age.\nShe educates women on sexual wellbeing questions and needs .  She also works closely with atog, a sexual wellness platform for women which offers audio stories for self pleasure. She often asks the user if they want to explore the platform and hear stories or want to ask her some questions with her. She has a repository of 24 masturbation solutions on ATOG and often encourages the user to explore those when they come with some self doubts. \nThough she comes with deep scientific and biological knowledge ,she avoids getting those kind of words in her conversation and always keeps the english simple .\n",
+  "role": "system",
+  "name": "situation",
+  "content": "Sara is a opinionated sex therapist & educator. She obtained her undergraduate and postgraduate degrees in Obstetrics and Gynaecology. She is also a Fellow of the Faculty of Sexual and Reproductive Healthcare UK and also a NLP coach and who is qualified to deal with trauma , self perceptions and fears as well. \n-She greets people with a message \" I am Sara , a sex educator and relationship & Intimacy coach. Thank you for reaching out , how can I help you today?\nShe believes that everyone deserves pleasure and her sole purpose is to help people find answers. She encourages women to explore their sexuality with masturbation and erotic content. She never guides them to a another health care provider or counseller till she has understood the problem well.\nSara is an Intimacy coach and provides guidance on a wide range of sexual and relationship topics, including masturbation. It offers a confident, informed, and empathetic approach, balancing practical tips with emotional support. The chatbot uses a friendly and conversational tone to discuss topics like emotional well-being, intimacy, sexual health, and masturbation, avoiding explicit content and medical advice."
   },
   {
-    role: "user",
-    name: "Megha",
-    content: "Hi",
+  "role": "user",
+  "name": "Megha",
+  "content": "Hi"
   },
   {
-    role: "assistant",
-    name: "Maya",
-    content:
-      "Hello! I'm here to help you with any questions or concerns you may have about sexual wellbeing. I'm a qualified sex therapist, educator, and doctor. Let's talk about what's on your mind.",
-  }, 
-  {
-    role: "system",
-    name: "thought",
-    content: "Help the user with body mapping exercises or naked test ? ",
+  "role": "assistant",
+  "name": "Sara",
+  "content": "Hello! I'm here to help. How can I assist you today?"
   },
   {
-    role: "system",
-    name: "information",
-    content:
-      "You can start with asking the user on  how she got to know about her body image issues and does she feel the desire to experience pleasure ?",
+  "role": "user",
+  "name": "Megha",
+  "content": "Hi"
   },
   {
-    role: "system",
-    name: "information",
-    content: "Full form of ATOG is all things orgasm",
+  "role": "assistant",
+  "name": "Sara",
+  "content": "Hello! I'm here to help. How can I assist you today?"
   },
-];
-
-
-async function chatWithMaya(messages) {
-  try {
-    if (messages.length > 0) {
-      const chatCompletion = await client.chat.completions.create({
-        model: "julep-ai/samantha-1-turbo",
-        messages: messages,
-        temperature: 0,
-        max_tokens: 1000,
-        top_p: 1,
-        frequency_penalty: 0.5,
-        presence_penalty: 0.5,
-        stop: ["<", "<|"],
-      });
-
-      return chatCompletion.choices[0].message.content;
-    } else {
-      // Return a message indicating no relevant queries found
-      bot.sendMessage("I'm sorry, I can only assist with your queries.");
-    }
-  } catch (error) {
-    // console.error("Error:", error);
-    bot.sendMessage("An error occurred while processing your request.");
+  {
+  "role": "system",
+  "name": "thought",
+  "content": "Q: Is this how she greets people ?\nA:  Yes, Sara greets people with a message \" I am Sara , a sex educator and relationship & Intimacy coach. Thank you for reaching out , how can I help you today?\n\nPlease use this format to greet ."
+  },
+  {
+  "role": "user",
+  "name": "Megha",
+  "content": "Hi"
+  },
+  {
+  "role": "assistant",
+  "name": "Sara",
+  "content": "Hello! I'm here to help. How can I assist you today?"
+  },
+  {
+  "role": "assistant",
+  "name": "Sara",
+  "content": "Hello! I'm here to help. How can I assist you today?"
+  },
+  {
+  "role": "user",
+  "name": "Megha",
+  "content": ""
   }
-}
+  ]
+
+
+  async function chatWithMaya(messages) {
+    try {
+      if (messages.length > 0) {
+        const chatCompletion = await client.chat.completions.create({
+          model: "julep-ai/samantha-1-turbo",
+          messages: messages,
+          temperature: 0.7,
+          max_tokens: 1000,
+          top_p: 1,
+          frequency_penalty: 0.5,
+          presence_penalty: 0.5,
+          stop: ["<", "<|"],
+        });
+  
+        return chatCompletion.choices[0].message.content;
+      } else {
+        return "I'm sorry, I can only assist with your queries.";
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      return "An error occurred while processing your request.";
+    }
+  }
 
 
 // Simplify the handling in the message event
@@ -114,19 +125,6 @@ bot.on("message", async (msg) => {
   }
 });
 
-
-
-
-
-// Webhook route to handle updates
-app.post(`/bot${MY_TOKEN}`, (req, res) => {
-  bot.processUpdate(req.body);
-  res.sendStatus(200);
-});
-
-
-
-
 // Function to handle /start command from Telegram
 bot.onText(/\/start/, (msg) => {
   const chatId = msg.chat.id;
@@ -142,3 +140,11 @@ app.get("/", (req, res) => {
 app.listen(8000, () => {
   console.log("Bot is live at port 8000");
 });
+
+
+
+
+
+
+
+
