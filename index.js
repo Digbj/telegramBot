@@ -98,6 +98,14 @@ messages = [
 
 
 // Simplify the handling in the message event
+const audioStories = [
+  "Audio Story 1: [Link to audio]",
+  "Audio Story 2: [Link to audio]",
+  "Audio Story 3: [Link to audio]"
+];
+
+let questionCount = 0;
+
 bot.on("message", async (msg) => {
   const chatId = msg.chat.id;
 
@@ -105,16 +113,46 @@ bot.on("message", async (msg) => {
   if (msg.text) {
     try {
       // Handling basic greetings
-      if (msg.text.toLowerCase() === "hi" || msg.text.toLowerCase() === "hello") {
-        const welcomeMessage = "Hello! I'm here to help you with any questions or concerns you may have about sexual wellbeing. I'm a qualified sex therapist, educator, and doctor. Let's talk about what's on your mind.";
+      if (
+        msg.text.toLowerCase() === "hi" ||
+        msg.text.toLowerCase() === "hello" ||
+        msg.text.toLowerCase() === "hey" ||
+        msg.text.toLowerCase() === "hy"
+      ) {
+        const welcomeMessage =
+        "Hi, I am Sara, your dedicated relationship and intimacy coach. Welcome to ATOG, where our mission is to empower women to explore and understand their sexuality. Would you like to ask questions or listen to audio stories?\n\n→ Type 1 to Listen Audio Stories\n\n→ Type AMA to ask questions";
         bot.sendMessage(chatId, welcomeMessage);
+      } else if (msg.text.toLowerCase() === "1") {
+        const playlistMessage = "Here are some audio stories for you:\n\n";
+        const formattedAudioStories = audioStories.map(
+          (story, index) => `${index + 1}. ${story}`
+        );
+        bot.sendMessage(
+          chatId,
+          playlistMessage + formattedAudioStories.join("\n")
+        );
+      } else if (msg.text.toLowerCase() === "ama") {
+        const amaMessage =
+          "Feel free to ask me anything related to relationships, intimacy, or sexual wellbeing.";
+        bot.sendMessage(chatId, amaMessage);
       } else {
-        // Directly handling any message without filtering for specific keywords
-        const response = await chatWithMaya([
-          { role: "user", name: "User", content: msg.text }
-        ]);
+        // Increment question count if it's not a basic command
+        questionCount++;
 
-        bot.sendMessage(chatId, response);
+        // Check if the user has asked 5 questions
+        if (questionCount === 5) {
+          const additionalMessage =
+    "You seem to be a curious and interesting person who enjoys learning more about sexual wellbeing. \n\n Type 1 to explore our audio series.\n\nVisit us on www.atog.in for more stories.";
+bot.sendMessage(chatId, additionalMessage);
+        
+        } else {
+          // Directly handling any message without filtering for specific keywords
+          const response = await chatWithMaya([
+            { role: "user", name: "User", content: msg.text },
+          ]);
+
+          bot.sendMessage(chatId, response);
+        }
       }
     } catch (error) {
       console.error("Error:", error);
@@ -124,6 +162,8 @@ bot.on("message", async (msg) => {
     bot.sendMessage(chatId, "Could you please clarify your request?");
   }
 });
+
+
 
 // Function to handle /start command from Telegram
 bot.onText(/\/start/, (msg) => {
