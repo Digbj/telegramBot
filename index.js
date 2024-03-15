@@ -79,7 +79,7 @@ bot.on("message", async (msg) => {
     userMessage.toLowerCase() === "hey"
   ) {
     const welcomeMessage =
-      "Hi, I am Sara, your dedicated relationship and intimacy coach. Welcome to ATOG, where our mission is to empower women to explore and understand their sexuality. Would you like to ask questions or listen to audio stories?\n\n→ Type 1 to Listen Audio Stories\n\n→ Type AMA to ask questions";
+      "Hello! I'm Sara, your relationship and intimacy coach, here to guide you on a journey of sexual discovery and empowerment. At ATOG, our passion is helping women like you embrace and understand their sexuality in a safe, open, and nurturing environment. How can I assist you today?\n\n • Type 1: Dive into our collection of audio stories, designed to enlighten and inspire.\n\n • Type AMA: Feel free to ask me any questions. No topic is off-limits, and every query is a step towards understanding and embracing your sexual wellbeing.\n\nRemember, this is a safe space to explore, learn, and grow. I'm here to support you every step of the way."
     bot.sendMessage(chatId, welcomeMessage);
   } else if (userMessage.toLowerCase() === "1") {
     // Send audio stories
@@ -120,16 +120,16 @@ bot.on("message", async (msg) => {
     const julepResponse = await interactWithJulep(messages);
 
     // Increment response count
-    responseCount++;
+    // responseCount++;
 
-    // Check if response count is a multiple of 5
-    if (responseCount % 5 === 0) {
-      // Send the additional message
-      bot.sendMessage(
-        chatId,
-        "You seem to be a curious and interesting person who enjoys learning more about sexual wellbeing. \n\n Type 1 to explore our audio series.\n\nVisit us on www.atog.in for more stories."
-      );
-    }
+    // // Check if response count is a multiple of 5
+    // if (responseCount % 5 === 0) {
+    //   // Send the additional message
+    //   bot.sendMessage(
+    //     chatId,
+    //     "You seem to be a curious and interesting person who enjoys learning more about sexual wellbeing. \n\n Type 1 to explore our audio series.\n\nVisit us on www.atog.in for more stories."
+    //   );
+    // }
 
     // Send Julep's response to the user
     bot.sendMessage(chatId, julepResponse);
